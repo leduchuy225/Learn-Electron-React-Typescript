@@ -1,0 +1,28 @@
+$sizes: 0, 4, 8, 16, 50;
+
+* {
+  font-family: "Times New Roman", Times, serif !important;
+}
+
+@each $size in $sizes {
+  .radius-#{$size} {
+    border-radius: $size;
+  }
+  .radius-bl-#{$size} {
+    border-bottom-left-radius: $size;
+  }
+  .radius-br-#{$size} {
+    border-bottom-right-radius: $size;
+  }
+  .radius-tl-#{$size} {
+    border-top-left-radius: $size;
+  }
+  .radius-tr-#{$size} {
+    border-top-right-radius: $size;
+  }
+}
+
+.row {
+  display: flex;
+  flex-direction: row;
+}

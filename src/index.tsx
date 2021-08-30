@@ -1,10 +1,10 @@
 import React from "react";
 import ReactDOM from "react-dom";
-import App from "./App";
+import ViewManager from "./view-manager";
 
 ReactDOM.render(
   <React.StrictMode>
-    <App />
+    <ViewManager />
   </React.StrictMode>,
   document.getElementById("root")
 );

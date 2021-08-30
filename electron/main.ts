@@ -1,4 +1,4 @@
-import { app, BrowserWindow } from "electron";
+import { app, BrowserWindow, Menu, MenuItem } from "electron";
 import * as path from "path";
 import * as isDev from "electron-is-dev";
 
@@ -6,25 +6,27 @@ import * as isDev from "electron-is-dev";
   REACT_DEVELOPER_TOOLS,
 } from "electron-devtools-installer"; */
 
-let win: BrowserWindow | null = null;
+let mainWindow: BrowserWindow | null = null;
+let subWindow: BrowserWindow | null = null;
+
+const localUrl = "http://localhost:3000/index.html";
+const prodPath = `file://${__dirname}/../index.html`;
 
 function createWindow() {
-  win = new BrowserWindow({
+  mainWindow = new BrowserWindow({
     width: 800,
     height: 600,
+    title: "Todo List",
     webPreferences: {
       nodeIntegration: true,
+      contextIsolation: false,
+      enableRemoteModule: true,
     },
   });
 
-  if (isDev) {
-    win.loadURL("http://localhost:3000/index.html");
-  } else {
-    // 'build/index.html'
-    win.loadURL(`file://${__dirname}/../index.html`);
-  }
-
-  win.on("closed", () => (win = null));
+  isDev
+    ? mainWindow.loadURL(`${localUrl}?viewA`)
+    : mainWindow.loadURL(`${prodPath}?viewA`); // 'build/index.html'
 
   // Hot Reloading
   if (isDev) {
@@ -49,20 +51,55 @@ function createWindow() {
     .catch((err) => console.log("An error occurred: ", err)); */
 
   if (isDev) {
-    win.webContents.openDevTools();
+    // window.webContents.openDevTools();
   }
+
+  const customMenu = new MenuItem({
+    label: "Utility",
+    submenu: [
+      {
+        label: "RAM && CPU",
+        click: openRamCPUWindow,
+      },
+    ],
+  });
+  const menu = Menu.getApplicationMenu();
+  menu?.append(customMenu);
+  Menu.setApplicationMenu(menu);
+
+  mainWindow.on("closed", function () {
+    app.quit();
+  });
+
+  mainWindow.on("closed", () => (mainWindow = null));
+}
+
+function openRamCPUWindow() {
+  subWindow = new BrowserWindow({
+    width: 300,
+    height: 200,
+    title: "RAM & CPU",
+  });
+
+  isDev
+    ? subWindow.loadURL(`${localUrl}?viewB`)
+    : subWindow.loadURL(`${prodPath}?viewB`); // 'build/index.html'
+
+  subWindow.menuBarVisible = false;
+
+  subWindow.on("close", function () {
+    subWindow = null;
+  });
 }
 
 app.on("ready", createWindow);
 
 app.on("window-all-closed", () => {
-  if (process.platform !== "darwin") {
-    app.quit();
-  }
+  app.quit();
 });
 
 app.on("activate", () => {
-  if (win === null) {
+  if (mainWindow === null) {
     createWindow();
   }
 });

@@ -1,0 +1,10 @@
+$background: white;
+
+.todo-list {
+  .header {
+    top: 0;
+    z-index: 2;
+    position: sticky;
+    background-color: $background;
+  }
+}
